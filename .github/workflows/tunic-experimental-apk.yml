@@ -1,4 +1,5 @@
 # PEANUTS: experimental, source-only build of a separate TUNIC Android test APK. Never uploads game data, keys, ROMs or shader libraries.
+# PEANUTS: the v2 (2-GiB pool) APK uses a new package ID because GitHub's ephemeral debug signing key cannot update the original tunictest APK.
 name: TUNIC experimental Android APK
 
 on:
@@ -59,14 +60,33 @@ jobs:
           test -s "$RUNNER_TEMP/tunic-ondevice/stage/lib/libdmsh_xlate.so"
           test -s "$RUNNER_TEMP/tunic-ondevice/stage/lib/libnxpack.so"
 
+      # PEANUTS: to make *future* APKs updatable, configure a GitHub Actions secret
+      # TUNIC_TEST_KEYSTORE_B64 containing a base64-encoded private keystore
+      # with Android's conventional debug alias/password. Never commit that file.
+      # Without the secret, each runner generates its own temporary signing key.
+      - name: Restore persistent test signing key, when configured
+        shell: bash
+        env:
+          TUNIC_TEST_KEYSTORE_B64: ${{ secrets.TUNIC_TEST_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$TUNIC_TEST_KEYSTORE_B64" ]; then
+            mkdir -p "$HOME/.android"
+            printf '%s' "$TUNIC_TEST_KEYSTORE_B64" | base64 --decode > "$HOME/.android/debug.keystore"
+            chmod 600 "$HOME/.android/debug.keystore"
+            keytool -list -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey >/dev/null
+            echo "Persistent test signing key restored (private content not printed)"
+          else
+            echo "::warning::No TUNIC_TEST_KEYSTORE_B64 secret. This APK will be debug-signed by the runner; future Actions APKs may have incompatible signatures."
+          fi
+
       - name: Compile isolated Peanuts test APK (TUNIC only)
         working-directory: android/app
         run: |
           chmod +x ./gradlew
           ./gradlew apk --no-daemon \
             -PnxApp=peanuts \
-            -PnxAppId=tunictest \
-            -PnxLabel="Peanuts TUNIC test" \
+            -PnxAppId=tunicmemtest \
+            -PnxLabel="Peanuts TUNIC 2GB" \
             -PnxGames=0100DA801624E000 \
             -PnxPackStage="$RUNNER_TEMP/tunic-ondevice/stage"
           test -s out/nxnative-android-peanuts.apk
