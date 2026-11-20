@@ -5,7 +5,7 @@ final class FrameRateCaps {
     static final int GAME_OWNED = -2;
     private FrameRateCaps() {}
 
-    static int[] menu() { return new int[] {GAME_OWNED, 120, 90, 0, 45, 40, 30, 20}; }
+    static int[] menu() { return new int[] {GAME_OWNED, 120, 90, 0, 45, 40, 30, 20, 15}; }
     static boolean contains(int[] values, int value) { for (int v : values) if (v == value) return true; return false; }
 
     static int[] rates(int maximum) {
@@ -16,6 +16,8 @@ final class FrameRateCaps {
 
     static int[] rates(int maximum, int minimum) {
         int[] all = rates(maximum);
+        // PEANUTS: Only an explicitly opted-in game profile exposes the 15 fps presenter limit.
+        if (minimum <= 15) { int[] low = new int[all.length + 1]; System.arraycopy(all, 0, low, 0, all.length); low[all.length] = 15; return low; }
         if (minimum <= 20) return all;
         int count = 0;
         for (int v : all) if (v <= 0 || v >= minimum) count++;
@@ -29,6 +31,6 @@ final class FrameRateCaps {
         if (value == GAME_OWNED) return GAME_OWNED;
         if (maximum >= 120 && value >= 120) return 120;
         if (maximum >= 90 && value >= 90) return 90;
-        return value <= 0 || value >= 60 ? 0 : value >= 45 ? 45 : value >= 40 ? 40 : value >= 30 ? 30 : 20;
+        return value == 15 ? 15 : value <= 0 || value >= 60 ? 0 : value >= 45 ? 45 : value >= 40 ? 40 : value >= 30 ? 30 : 20;
     }
 }

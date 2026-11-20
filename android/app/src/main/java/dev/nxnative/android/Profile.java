@@ -581,7 +581,7 @@ final class Profile {
             try { int maximum = c.length > 31 ? Integer.parseInt(c[31]) : 60; p.fpsLimitMax = maximum == 90 || maximum == 120 ? maximum : 60; } catch (NumberFormatException e) { p.fpsLimitMax = 60; }
             p.fpsLocker = c.length > 32 ? c[32] : "";
             p.fpsLockerPlan = c.length > 33 ? c[33] : "";
-            p.fpsLimitMin = c.length > 34 && "30".equals(c[34]) ? 30 : 20;
+            p.fpsLimitMin = c.length > 34 && "15".equals(c[34]) ? 15 : c.length > 34 && "30".equals(c[34]) ? 30 : 20; // PEANUTS: 15 is explicit, never a default
             p.fpsModes = c.length > 35 ? c[35] : "";
             p.fpsPlan120 = c.length > 36 ? c[36] : "";
             p.elapsedFrameStep = c.length > 37 && c[37].equals("1"); // PEANUTS: Optional trailing field for older profile tables.
