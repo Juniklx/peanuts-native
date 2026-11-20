@@ -790,21 +790,24 @@ def func_of(a):
     if i >= 0: return (starts[i], starts[i + 1] if i + 1 < len(starts) else TEXT_END)
     return (max((e for s, e in DATA_BLOCKS if e <= a), default=0), starts[0]) if starts else (a, a + 4)
 done = set(); windows = []; jumps = {}; tabjumps = {}; tailcalls = set(); retries = []
-def check_before_copy(insl, ctx, ld, idx):
-    """The index copied from the checked register before the check, far back (DRAGON QUEST XI S main+0x2dd8cd0: mov w0,w18, then 41 instructions with two other jump tables on x0, then
-    cmp w18,#4; b.hi; ldrsw x18,[x11,x0,lsl #2]; add x18,x18,x11; br x18). Accepted when the cmp and its b.hi come right before the load and the mov is the last writer of the index and of the
-    checked register before them. Kingdom Battle's GLSLC (subsdk0+0x7340b8) copies w17 into w18 71 instructions before the load, across two switches that preserve both registers: an arbitrary
-    64-instruction limit missed that copy. Follow the writers to the function's start, stopping at calls that can clobber either register or at gaps in decoded code. Blocks in between that branch out
-    and back (main+0x2dd8ce0 → main+0x2dd8cb8) write neither. Tried only when every other form has failed (jump_offsets copy_first), so sites that rewrote before come out the same:
-    the one br x18 of its kind among the 25,508 x18 sites of that main. → the cmp, or None"""
+def check_before_copy(insl, ctx, ld, idx, base=None):
+    """The checked register may be copied before its compare, with the table base built after the check.
+    PEANUTS(upstream-candidate): final, guarded fallback from DroidPlay Core's fix for Crash N. Sane Trilogy v0 main+0x997b78.
+    Only the base's adjacent adrp/add pair may separate cmp; b.hi from ldrsw; no jump may enter the intervening region.
+    The old adjacent-check form remains the default. Source: https://github.com/seedds/nxnative/issues/396"""
     k = ctx.index(ld)
-    if k < 2 or ctx[k - 1].mnemonic != 'b.hi' or ctx[k - 2].mnemonic != 'cmp': return None
-    m = re.fullmatch(r'(w\d+), #(0x[0-9a-f]+|\d+)', ctx[k - 2].op_str)
+    if base:   # PEANUTS(upstream-candidate): the base register is built after the bound check
+        if k < 4 or ctx[k - 2].mnemonic != 'adrp' or not ctx[k - 2].op_str.startswith(base + ',') or 'w' + base[1:] in idx: return None
+        if ctx[k - 1].mnemonic != 'add' or not re.fullmatch(rf'{base}, {base}, #(0x[0-9a-f]+|\d+)', ctx[k - 1].op_str): return None
+    kc = k - 4 if base else k - 2
+    if kc < 0 or ctx[kc + 1].mnemonic != 'b.hi' or ctx[kc].mnemonic != 'cmp': return None
+    if base and any(b.address != a.address + 4 for a, b in zip(ctx[kc:k], ctx[kc + 1:k + 1])): return None
+    m = re.fullmatch(r'(w\d+), #(0x[0-9a-f]+|\d+)', ctx[kc].op_str)
     if not m: return None
-    src, kl = m.group(1), insl.index(ld)
-    def writes(p):   # capstone lists a compare's first operand as written (cmp w18,#4 at main+0x2dd8c30); it only sets the flags
+    src, kl = m.group(1), insl.index(ctx[kc])
+    def writes(p):   # Capstone counts the compared register as written, although cmp only changes the flags
         return set() if p.mnemonic in ('cmp', 'cmn', 'tst') else {'w' + p.reg_name(r)[1:] for r in p.regs_access()[1]}
-    for q in range(kl - 3, -1, -1):
+    for q in range(kl - 1, -1, -1):
         p = insl[q]
         if p.address + 4 != insl[q + 1].address: return None
         if p.mnemonic in ('bl', 'blr') and any(int(r[1:]) <= 18 for r in idx | {src}): return None
@@ -812,8 +815,14 @@ def check_before_copy(insl, ctx, ld, idx):
         if mm and mm.group(1) in idx and mm.group(2) == src: break
         if writes(p) & (idx | {src}): return None
     else: return None
-    return ctx[k - 2]
-def jump_offsets(insl, j, copy_first=False, far_base=False, forward_base=False):
+    if base:
+        lo, hi = p.address, ld.address
+        for x in insl:
+            if (x.mnemonic in ('b', 'bl', 'cbz', 'cbnz', 'tbz', 'tbnz') or x.mnemonic.startswith('b.')) and lo < x.operands[-1].imm <= hi: return None
+        if any(lo < t <= hi for targets in tabjumps.values() for t in targets): return None
+        if any(b <= hi and b + 4 * width > lo + 4 for b, width in jumps.values()): return None
+    return ctx[kc]
+def jump_offsets(insl, j, copy_first=False, far_base=False, forward_base=False, base_after_check=False):   # PEANUTS(upstream-candidate): verified Alchemy checked-copy dispatch
     """The br x18 is preceded by the offset-table form (Engage main+0x12eec94): cmp w18,#N; b.hi; ldrsw x18,[xB,x18,lsl #2]; add x18,x18,xB.
     The index may be another register, and the bounds check may be on a register copied into it: Link's Awakening's GLSLC (subsdk0+0x1be6e8) has
     sub w0,w18,#0xd1; cmp w0,#0x31; b.hi; ldrsw x18,[x17,x0,lsl #2], its movie module (subsdk1+0xae9a4) cmp w21,#7; b.hi; ...; mov w18,w21; ldrsw x18,[x4,x18,lsl #2].
@@ -855,7 +864,7 @@ def jump_offsets(insl, j, copy_first=False, far_base=False, forward_base=False):
                     cmp = p
                 break
             if cmp: break
-    if not cmp and copy_first: cmp = check_before_copy(insl, ctx, ld, idx)
+    if not cmp and copy_first: cmp = check_before_copy(insl, ctx, ld, idx, rb if base_after_check else None)   # PEANUTS(upstream-candidate)
     if not cmp: return None
     n = int(cmp.op_str.split('#')[1], 0) + 1
     k = insl.index(ld); lo = page = None
@@ -1350,6 +1359,7 @@ for n_fn, (fa, fb) in enumerate(funcs):
                 if not tgt: tgt = jump_masked_not(insl, j)   # a complemented low-bit index with its zero case branched away: exactly mask entries
                 if not tgt: tgt = jump_offsets(insl, j, copy_first=True, far_base=True, forward_base=True)   # a unique base initialized in a later block that branches backward
                 if not tgt: tgt = jump_zero_extended(insl, j)   # a 32-bit checked value zero-extended into the index, with its full path to the br verified
+                if not tgt: tgt = jump_offsets(insl, j, copy_first=True, base_after_check=True)   # PEANUTS(upstream-candidate): Crash N. Sane Trilogy cmp/guard before table base
                 assert tgt, f'jump table {ins.address:x}'
                 tabjumps[ins.address] = tgt; continue
             jumps[ins.address] = (base, width)

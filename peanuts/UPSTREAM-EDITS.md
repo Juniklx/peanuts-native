@@ -1396,3 +1396,10 @@ The Trinity reader in `dm/gfx/tools/shader_split.py` narrows a recognized build 
 | `dm/games/0100B8E016F76000/game.tsv`, `dm/games/0100B8E016F76000/README.md` | 2, 1 | NieR:Automata (Asian release) on Android: `depth_mode zero` as the global profile; frame limits 30 to 60 measured on an AYN Thor; the note's Android section | `PEANUTS` |
 | `dm/games/0100B8E016F76000/vk_prewarm.bin` | new | its Turnip prewarm seed (225 keys) | allow-listed in `peanuts/upstream-unmarked.txt` |
 | `README.md`, `peanuts/docs/README.github.md` | 1 + 1 each | the game's table row and its paragraph under Upcoming in 0.1.6 | inside the files' `PEANUTS` sections |
+
+### Crash Bandicoot N. Sane Trilogy — initial Android bring-up (2026-11-20)
+
+- Import the public `0100D1B006744000` v0 profile and generated shader-index tables from `enjoyerofslop/droidplay-core` commit `8115593e` (MIT-licensed), unchanged where they are shader-input data. Do not commit compiled shaders, dumps, game executables, ROM files or keys.
+- Experimental separate Android APK: `dev.nxnative.android.crashnsttest`, built from source with an on-device packer. Official Peanuts Native and all TUNIC test apps are unchanged.
+- Prior external Android tests on Galaxy Z Fold 8 (Adreno 840) reached N. Sanity Beach at ~30 FPS. Peanuts Native + Galaxy S24 FE not yet tested; neither memory layout nor shader capture/rewrite has been validated. A previously missing jump-table form from [nxnative #396](https://github.com/seedds/nxnative/issues/396) now has a narrow, last-resort, PEANUTS(upstream-candidate) fallback in `dm/tools/patch_nso.py` adapted from DroidPlay Core; it is not yet tested with the user's dump. It does not touch the shader translation chain.
+- No addition to the stable release title list and no effect on shader translator/chain. See the game note and `peanuts/docs/CRASH-NST-ANDROID.md` for test conditions.

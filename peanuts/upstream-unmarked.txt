@@ -213,3 +213,9 @@ dm/games/01007A2027548000/shader_facts.tsv	Generated compute launch dimensions. 
 dm/games/01007A2027548000/shader_pairs.tsv	Generated vertex and pixel key pairs. Keep the shader input stamp reproducible.
 dm/games/01007A2027548000/pso_pairs.tsv	Generated supplemental pair list. Keep the shader input stamp reproducible.
 dm/games/01007A2027548000/shader_files.tsv	Generated shader-bearing file inventory for the targeted split.
+dm/games/0100D1B006744000/bf_want.tsv	Public source-only shader table for Crash Bandicoot N. Sane Trilogy v0, byte-identical to DroidPlay Core commit 8115593e; do not change data-table digests with PEANUTS markers.
+dm/games/0100D1B006744000/pso_manifest.tsv	Public source-only shader table for Crash Bandicoot N. Sane Trilogy v0, byte-identical to DroidPlay Core commit 8115593e; do not change data-table digests with PEANUTS markers.
+dm/games/0100D1B006744000/shader_facts.tsv	Public source-only shader table for Crash Bandicoot N. Sane Trilogy v0, byte-identical to DroidPlay Core commit 8115593e; do not change data-table digests with PEANUTS markers.
+dm/games/0100D1B006744000/shader_map.tsv	Public source-only shader table for Crash Bandicoot N. Sane Trilogy v0, byte-identical to DroidPlay Core commit 8115593e; do not change data-table digests with PEANUTS markers.
+dm/games/0100D1B006744000/shader_map.tsv.conflicts.tsv	Public source-only shader table for Crash Bandicoot N. Sane Trilogy v0, byte-identical to DroidPlay Core commit 8115593e; do not change data-table digests with PEANUTS markers.
+dm/games/0100D1B006744000/shader_pairs.tsv	Public source-only shader table for Crash Bandicoot N. Sane Trilogy v0, byte-identical to DroidPlay Core commit 8115593e; do not change data-table digests with PEANUTS markers.
