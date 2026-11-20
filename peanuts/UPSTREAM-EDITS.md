@@ -1396,3 +1396,11 @@ The Trinity reader in `dm/gfx/tools/shader_split.py` narrows a recognized build 
 | `dm/games/0100B8E016F76000/game.tsv`, `dm/games/0100B8E016F76000/README.md` | 2, 1 | NieR:Automata (Asian release) on Android: `depth_mode zero` as the global profile; frame limits 30 to 60 measured on an AYN Thor; the note's Android section | `PEANUTS` |
 | `dm/games/0100B8E016F76000/vk_prewarm.bin` | new | its Turnip prewarm seed (225 keys) | allow-listed in `peanuts/upstream-unmarked.txt` |
 | `README.md`, `peanuts/docs/README.github.md` | 1 + 1 each | the game's table row and its paragraph under Upcoming in 0.1.6 | inside the files' `PEANUTS` sections |
+
+### TUNIC 1.0.3 — experimental Galaxy S24 FE bring-up (2026-11-20)
+
+- Imported publicly maintained TUNIC game profile, shader inputs and Mac test notes from `seedds/nxnative`. All generated tables are byte-identical to their source, no game assets or pack binaries are committed.
+- Initial S24 FE log: `MapPhysicalMemory` refused requests at about 0.94 GiB in the 1 GiB app pool, followed by `SIGSEGV sdk+0x58979c`. Increase only `app_pool` to `0x80000000` (2 GiB).
+- With the 2-GiB profile, contributor reports controlling the fox, then 120 FPS shown in the app's counter with apparently normal game speed and no noticeable dips; this is not an independent benchmark or long-run validation.
+- `fps_limit_present 1` and `fps_limit_max 120` expose the existing Android host presentation-only 20–120 FPS selector, with Game owned default. This does **not** prove an engine-side Unity timing unlock and does not alter shaders. The opt-in 15 FPS UI/validation patch belongs to a separate PR if desired.
+- No release-catalog enrollment, signing keys, experimental APK workflow, fork-only launch docs, binaries or other changes are included. The maintainer should confirm title scope and device support before shipping.

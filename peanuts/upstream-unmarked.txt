@@ -213,3 +213,10 @@ dm/games/01007A2027548000/shader_facts.tsv	Generated compute launch dimensions. 
 dm/games/01007A2027548000/shader_pairs.tsv	Generated vertex and pixel key pairs. Keep the shader input stamp reproducible.
 dm/games/01007A2027548000/pso_pairs.tsv	Generated supplemental pair list. Keep the shader input stamp reproducible.
 dm/games/01007A2027548000/shader_files.tsv	Generated shader-bearing file inventory for the targeted split.
+dm/games/0100DA801624E000/bf_want.tsv	TUNIC 1.0.3: generated shader-input table imported unchanged from public seedds/nxnative profile; a marker would change the shader input digest, see game note.
+dm/games/0100DA801624E000/pso_manifest.tsv	TUNIC 1.0.3: generated shader-input table imported unchanged from public seedds/nxnative profile; a marker would change the shader input digest, see game note.
+dm/games/0100DA801624E000/pso_pairs.tsv	TUNIC 1.0.3: generated shader-input table imported unchanged from public seedds/nxnative profile; a marker would change the shader input digest, see game note.
+dm/games/0100DA801624E000/shader_facts.tsv	TUNIC 1.0.3: generated shader-input table imported unchanged from public seedds/nxnative profile; a marker would change the shader input digest, see game note.
+dm/games/0100DA801624E000/shader_map.tsv	TUNIC 1.0.3: generated shader-input table imported unchanged from public seedds/nxnative profile; a marker would change the shader input digest, see game note.
+dm/games/0100DA801624E000/shader_map.tsv.conflicts.tsv	TUNIC 1.0.3: generated shader-input table imported unchanged from public seedds/nxnative profile; a marker would change the shader input digest, see game note.
+dm/games/0100DA801624E000/shader_pairs.tsv	TUNIC 1.0.3: generated shader-input table imported unchanged from public seedds/nxnative profile; a marker would change the shader input digest, see game note.

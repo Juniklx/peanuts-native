@@ -202,6 +202,7 @@ One row per profile; the notes are each profile's `README.md`.
 | [Tomodachi Life: Living the Dream](010051F0207B2000/README.md) | `010051F0207B2000` | 1.0.4 | 20 | Nintendo | NVN |
 | [Trails in the Sky 2nd Chapter](01007A2027548000/README.md) | `01007A2027548000` | 1.0.3 | 21.4.4 | Nihon Falcom | NVN | <!-- PEANUTS -->
 | [TRIANGLE STRATEGY](0100CC80140F8000/README.md) | `0100CC80140F8000` | 1.1.1 | 12.3.2 | Unreal Engine 4.27 | NVN |
+| [TUNIC](0100DA801624E000/README.md) | `0100DA801624E000` | 1.0.3 (Android user-tested) | 14.3.0 | Unity 2020.3.36f1 IL2CPP, FMOD | NVN <!-- PEANUTS: public nxnative profile; S24 FE user reports playable and 120 FPS --> |
 | [Unicorn Overlord](010069401ADB8000/README.md) | `010069401ADB8000` | 1.05 | 16.2.4 | Vanillaware's engine | NVN |
 | [Unicorn Overlord, Asian release](010054B01AD92000/README.md) | `010054B01AD92000` | 1.05 | 16.2.4 | Vanillaware's engine | NVN |
 | [Well Dweller](0100217023F6C000/README.md) | `0100217023F6C000` | 1.0.0 | 22.2.0 | GameMaker Studio 2 (its runner) | OpenGL |
