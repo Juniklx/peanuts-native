@@ -6,7 +6,7 @@
 
 The user reported that the 2-GiB build reaches the menu and allows controlling the fox. This is not a verified 60/90/120-FPS result. The initial Android log reported **no applicable engine FPS cap or rewritten frame-step**. The 60-FPS Mac profile is not evidence of 60-FPS Android play.
 
-The experimental profile now offers **Game owned** (safe default), **20, 30, 40, 45, 60, 90 and 120 FPS**. They are Android host *presentation-only* ceilings from `fps_limit_present 1` and `fps_limit_max 120`, **not** an engine unlock; the game may still present only ~30 FPS, or timing may become incorrect. Numeric limits are opt-in, show the experimental warning in Game settings and the in-game panel, and require restart when switching from/to Game owned.
+The experimental profile now offers **Game owned** (safe default), **15, 20, 30, 40, 45, 60, 90 and 120 FPS**. They are Android host *presentation-only* ceilings from `fps_limit_present 1`, `fps_limit_max 120` and `fps_limit_min 15`, **not** an engine unlock; the game may still present only ~30 FPS, or timing may become incorrect. Numeric limits are opt-in, show the experimental warning in Game settings and the in-game panel, and require restart when switching from/to Game owned.
 
 **No shader recompilation is required by this profile-only FPS change.** The new package ID is `dev.nxnative.android.tunicfpstest` because the earlier experimental APK had an unrecoverable GitHub-runner debug signature. To reuse the prepared pack from the already installed 2-GiB app, back up the original directory, then copy only the TUNIC pack folder from:
 

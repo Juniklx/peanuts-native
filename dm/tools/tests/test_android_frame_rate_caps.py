@@ -22,7 +22,11 @@ public class FrameRateCapsTest {
         check(FrameRateCaps.normalize(60, 120) == 0); // saved zero retains its old meaning
         check(FrameRateCaps.normalize(0, 120) == 0 && FrameRateCaps.normalize(-1, 120) == 0);
         for (int rate : new int[] {45, 40, 30, 20}) check(FrameRateCaps.normalize(rate, 120) == rate);
-        check(FrameRateCaps.normalize(15, 120) == 20);
+        check(FrameRateCaps.normalize(15, 120) == 15); // honored only when the profile opts in with fps_limit_min 15
+        check(!FrameRateCaps.contains(FrameRateCaps.rates(120, 20), 15)); // default profile remains unchanged
+        check(!FrameRateCaps.contains(FrameRateCaps.rates(60, 30), 15));
+        check(FrameRateCaps.contains(FrameRateCaps.rates(120, 15), 15));
+        check(FrameRateCaps.contains(FrameRateCaps.menu(), 15));
         int[] changed = FrameRateCaps.rates(120); changed[0] = 999;
         check(FrameRateCaps.rates(120)[0] == -2);
         check(FrameRateCaps.normalize(-2, 60) == -2 && FrameRateCaps.normalize(-2, 120) == -2);
