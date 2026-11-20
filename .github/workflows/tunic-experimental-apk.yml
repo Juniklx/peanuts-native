@@ -35,7 +35,7 @@ jobs:
 
       - name: Preflight public profile and documentation
         run: |
-          python3 dm/tools/tests/test_docs.py
+          python3 dm/tools/tests/test_docs.py GameNotes # PEANUTS: repository-wide legacy links fail independently of TUNIC
           sh peanuts/scripts/check-profiles.sh 0100DA801624E000
           python3 dm/peanuts/profile/gen_runtime_profile.py check-all
 

@@ -221,3 +221,4 @@ dm/games/0100DA801624E000/shader_facts.tsv	TUNIC 1.0.3: generated or shader-inpu
 dm/games/0100DA801624E000/shader_map.tsv	TUNIC 1.0.3: generated or shader-input data imported unchanged from nxnative; a PEANUTS marker would change its bytes/digest. Android support has not yet been verified; see the profile note.
 dm/games/0100DA801624E000/shader_map.tsv.conflicts.tsv	TUNIC 1.0.3: generated or shader-input data imported unchanged from nxnative; a PEANUTS marker would change its bytes/digest. Android support has not yet been verified; see the profile note.
 dm/games/0100DA801624E000/shader_pairs.tsv	TUNIC 1.0.3: generated or shader-input data imported unchanged from nxnative; a PEANUTS marker would change its bytes/digest. Android support has not yet been verified; see the profile note.
+docs/agents/game-patches.md	Generated patch/profile index: TUNIC profile adds the fps_target 60 row through dm/tools/docs_patches.py; do not add PEANUTS comments to generated output.
