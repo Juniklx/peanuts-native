@@ -33,6 +33,12 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      # PEANUTS: GitHub's ubuntu-24.04 image does not put sdkmanager on PATH.
+      # This pinned action installs Android command-line tools, accepts SDK licences, and exports the SDK location.
+      - uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+        with:
+          packages: 'platform-tools'
+
       - name: Preflight public profile and documentation
         run: |
           python3 dm/tools/tests/test_docs.py GameNotes # PEANUTS: repository-wide legacy links fail independently of TUNIC
@@ -43,6 +49,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y zsh ninja-build cmake
+          sdkmanager --version
           sdkmanager --install "platforms;android-36" "build-tools;36.0.0" "ndk;28.2.13676358" "cmake;3.22.1"
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
 
