@@ -1,0 +1,72 @@
+# PEANUTS: experimental, source-only build of a separate TUNIC Android test APK. Never uploads game data, keys, ROMs or shader libraries.
+name: TUNIC experimental Android APK
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/tunic-experimental-apk.yml'
+      - 'dm/games/0100DA801624E000/**'
+      - 'peanuts/docs/TUNIC-ANDROID.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    name: Build TUNIC test APK with native on-device Prepare
+    if: github.repository == 'Juniklx/peanuts-native'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.14'
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Preflight public profile and documentation
+        run: |
+          python3 dm/tools/tests/test_docs.py
+          sh peanuts/scripts/check-profiles.sh 0100DA801624E000
+          python3 dm/peanuts/profile/gen_runtime_profile.py check-all
+
+      - name: Install Android NDK, SDK and build prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh ninja-build cmake
+          sdkmanager --install "platforms;android-36" "build-tools;36.0.0" "ndk;28.2.13676358" "cmake;3.22.1"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
+
+      - name: Build the native on-device preparation engine
+        run: |
+          zsh peanuts/scripts/ondevice-stage.sh "$RUNNER_TEMP/tunic-ondevice" all
+          test -s "$RUNNER_TEMP/tunic-ondevice/stage/lib/libdmsh_xlate.so"
+          test -s "$RUNNER_TEMP/tunic-ondevice/stage/lib/libnxpack.so"
+
+      - name: Compile isolated Peanuts test APK (TUNIC only)
+        working-directory: android/app
+        run: |
+          chmod +x ./gradlew
+          ./gradlew apk --no-daemon \
+            -PnxApp=peanuts \
+            -PnxAppId=tunictest \
+            -PnxLabel="Peanuts TUNIC test" \
+            -PnxGames=0100DA801624E000 \
+            -PnxPackStage="$RUNNER_TEMP/tunic-ondevice/stage"
+          test -s out/nxnative-android-peanuts.apk
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: tunic-experimental-apk
+          path: android/app/out/nxnative-android-peanuts.apk
+          if-no-files-found: error
+          retention-days: 7

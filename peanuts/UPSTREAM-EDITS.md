@@ -1396,3 +1396,11 @@ The Trinity reader in `dm/gfx/tools/shader_split.py` narrows a recognized build 
 | `dm/games/0100B8E016F76000/game.tsv`, `dm/games/0100B8E016F76000/README.md` | 2, 1 | NieR:Automata (Asian release) on Android: `depth_mode zero` as the global profile; frame limits 30 to 60 measured on an AYN Thor; the note's Android section | `PEANUTS` |
 | `dm/games/0100B8E016F76000/vk_prewarm.bin` | new | its Turnip prewarm seed (225 keys) | allow-listed in `peanuts/upstream-unmarked.txt` |
 | `README.md`, `peanuts/docs/README.github.md` | 1 + 1 each | the game's table row and its paragraph under Upcoming in 0.1.6 | inside the files' `PEANUTS` sections |
+
+## TUNIC 1.0.3 — experimental Android profile import (2026-11-20)
+
+- **Source:** `seedds/nxnative`, `dm/games/0100DA801624E000/`. Its Mac profile and public shader facts/maps are imported, without game code, ROM data, shader binaries, keys or packs.
+- **Android status:** no device run, Vulkan shader build, pack, gamepad, save, audio or performance verification. The upstream Mac memory and 60 fps defaults are copied, not tuned for Android.
+- **Marked files:** `dm/games/0100DA801624E000/game.tsv` and `README.md` have `PEANUTS` notes; `dm/games/README.md` adds an explicitly unverified profile-table row.
+- **Unmarked generated tables:** `bf_want.tsv`, `pso_manifest.tsv`, `pso_pairs.tsv`, `shader_facts.tsv`, `shader_map.tsv`, `shader_map.tsv.conflicts.tsv`, `shader_pairs.tsv` under `dm/games/0100DA801624E000/` are listed in `peanuts/upstream-unmarked.txt`. Marking any generated input would change the digest that identifies its shader library.
+- **Release eligibility:** this profile is intentionally **absent** from `peanuts/release-titles.txt` and public supported-games catalog until an Android launch and limitations are documented.
