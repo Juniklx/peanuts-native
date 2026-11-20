@@ -1,13 +1,25 @@
-<!-- PEANUTS: Android bring-up is experimental and unverified; imported from the nxnative Mac profile. -->
-
-> **Android status (2026-11-20): not yet tested.** This profile and its public shader tables were imported from [seedds/nxnative](https://github.com/seedds/nxnative/tree/main/dm/games/0100DA801624E000) for a TUNIC 1.0.3 (v196608) Android bring-up. Mac results below are **not Android measurements**. No pack or Vulkan shader library has been built here, and no Android boot, graphics, audio, controller, save, or performance claim is made.
+<!-- PEANUTS: S24 FE Android bring-up is experimental; the bulk of the README below records upstream Mac results, not Android measurements. -->
+ 
+> **Android status (2026-11-20): reached menu and first playable scene (user-reported).** The first Samsung Galaxy S24 FE run failed at 1 GiB of application-pool memory; raising `app_pool` to 2 GiB allowed the user to reach the menu, begin a new game and control the fox. This is a positive functional test, **not** a measured FPS, verified save test, or compatibility certification. The only full diagnostic log so far is from the *failed 1-GiB run*.
 >
-> **Build and test:** Follow [Peanuts NEW-GAME.md](../../../peanuts/docs/NEW-GAME.md#5-pack) using your own dumped base game and update 1.0.3. Build a **separate test APK** with `-PnxGames=0100DA801624E000` and a distinct `-PnxAppId` (see the [test app instructions](../../../peanuts/docs/NEW-GAME.md#6-a-test-app)). Prepare and import the game/shader pack privately, then start it from the Peanuts game library. Collect the logs and test on the device's system Vulkan driver first. The Vulkan backend has not been validated for this title, especially on non-Adreno GPUs.
+> **Experimental FPS selector:** The profile now declares presentation-only opt-in limits of **20, 30, 40, 45, 60, 90 and 120 FPS**. **Game owned** remains the default, matching the successful bring-up configuration. These are ceilings in Android's presenter, not proven changes to Unity's game-time limit; the first Android log said `fps_target 60` was not applied because there was no FPS engine row or frame-step hook. 90/120 may never be reached, and forcing display cadence can change gameplay speed. The player must intentionally select a numeric limit, restart, then compare wall time/game time and video/audio stability. Return to **Game owned** if timing or graphics change.
 >
-> **Release catalog:** Do not add this title to `peanuts/release-titles.txt` until it has a successful on-device run and documented limitations. The original profile's memory settings and 60 fps target are retained as *unverified Android defaults*; assess real memory usage and consider a 30 fps diagnostic run before tuning.
+> **Build and test:** Source profile and public shader tables came from [seedds/nxnative](https://github.com/seedds/nxnative/tree/main/dm/games/0100DA801624E000), validated there **on Mac** for TUNIC Switch 1.0.3 (v196608). Follow [Peanuts NEW-GAME.md](../../../peanuts/docs/NEW-GAME.md) with your own dumped base game and 1.0.3 update. The GitHub Action builds an Android test app separately from the official Peanuts Native Release; installing a new test app may require copying the *existing* pack into its own Android/data folder (no shader translation changes were made).
+>
+> **Release catalog:** Do not add TUNIC to `peanuts/release-titles.txt` until longer Android tests establish render correctness, stable FPS, scene changes, saves and driver limitations. The Mac performance observations in the original sections below are **not** S24 FE benchmarks.
 
 ---
 
+## PEANUTS FPS opt-in trial (S24 FE, 2026-11-20)
+
+After the initial Android crash was resolved by raising `app_pool` to 2 GiB, the user reported reaching the menu and controlling the fox. No new runtime FPS log or timing comparison was supplied yet.
+
+The original `fps_target 60` profile comes from a **Mac** test where the host found Unity's `QualitySettings.vSyncCount` and `Application.targetFrameRate` fields. In the first **Android** log, `fps_target 60` was explicitly **not applied**: the Android host had neither a compatible frame-step hook nor an engine limit it could write. That is why simply selecting 60 FPS in a launcher is not evidence of an unlocked game.
+
+The opt-in `fps_limit_present 1` plus `fps_limit_max 120` reuses the existing Android presentation-only cap mechanism; it exposes the numeric requests 20/30/40/45/60/90/120 while keeping **Game owned** as the default. A request is a **maximum host presentation rate**, not a promise of physical frames, unlocked Unity internal frame rate, correct world speed, or working 120 Hz game logic. The UI warns about possible speed changes and calls for restart when entering/leaving Game owned. These keys are UI/runtime pacing settings and do **not** modify shader translation or the game pack. Test with the same route and elapsed wall time for at least 30 vs 60, plus animation/cutscene speed and audio synchronization. If play speed changes or frame cadence is unstable, return to Game owned. Do not publish this as a validated high-FPS patch.
+
+---
+ 
 ## PEANUTS Android first run — Galaxy S24 FE, 2026-11-20
 
 **Observed, not inferred:** TUNIC 1.0.3 (v196608) reached native guest startup with the Android Peanuts test app (`dev.nxnative.android.tunictest`) on a Samsung SM-S721B (Android 17, ~7.1 GiB physical RAM), RADV Xclipse Mesa 27.0.0-devel (Vulkan 1.4.368). The host initialized NVN/Vulkan, opened AAudio at 48 kHz stereo and created game threads; **no first playable picture has been verified**.

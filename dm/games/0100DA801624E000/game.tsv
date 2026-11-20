@@ -44,8 +44,13 @@ shader_note	Tunic shaders
 # ---- Frame rate ----
 # 60 fps (30 on the Switch): the game sets Unity's QualitySettings.vSyncCount to 2, which Unity hands to NVN as present interval 2, and steps by the time that really passed.
 # The rewriter finds vSyncCount and Application.targetFrameRate through Unity's internal-call table (dm/tools/unity_fps.py), the host writes the target there (hle_fpslock.c).
-# The speed checked at 30 and 60 by a timed walk (the same 3 s of the stick end at the same place); 120 not measured (fps_max stays 60)
+# The speed checked at 30 and 60 on Mac by a timed walk (the same 3 s of the stick end at the same place); 90/120 have not been measured on Android.
+# PEANUTS(Android): the Galaxy S24 FE reached the menu and gameplay using the 2 GiB pool (user report). The first Android log had no working FPS engine row or rewritten frame step, so DM_FPS_TARGET=60 is NOT proof that game time changes at 60.
 fps_target	60
+# PEANUTS(Android opt-in): expose host-side PRESENTATION caps only; these do not patch Unity's actual 30/60 game-time/vSync fields. Keep Game owned until a numeric rate is selected and the title is restarted.
+# 20, 30, 40, 45, 60, 90, 120 fps are requested ceilings, NOT verified TUNIC game-engine FPS. Validate gameplay speed, cutscenes, input and Vulkan each time; return to Game owned if anything accelerates/slows.
+fps_limit_present	1
+fps_limit_max	120
 
 # ---- Graphics ----
 # the game calls nvnDeviceSetDepthMode with near = 0: the pipeline bases made before it runs are made for that mode

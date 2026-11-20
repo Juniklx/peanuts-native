@@ -1,5 +1,5 @@
 # PEANUTS: experimental, source-only build of a separate TUNIC Android test APK. Never uploads game data, keys, ROMs or shader libraries.
-# PEANUTS: the v2 (2-GiB pool) APK uses a new package ID because GitHub's ephemeral debug signing key cannot update the original tunictest APK.
+# PEANUTS: the FPS opt-in build uses a NEW package ID (tunicfpstest) because GitHub's ephemeral debug signing keys cannot update the installed tunicmemtest APK. Keep previous app and packs.
 name: TUNIC experimental Android APK
 
 on:
@@ -85,8 +85,8 @@ jobs:
           chmod +x ./gradlew
           ./gradlew apk --no-daemon \
             -PnxApp=peanuts \
-            -PnxAppId=tunicmemtest \
-            -PnxLabel="Peanuts TUNIC 2GB" \
+            -PnxAppId=tunicfpstest \
+            -PnxLabel="Peanuts TUNIC FPS test" \
             -PnxGames=0100DA801624E000 \
             -PnxPackStage="$RUNNER_TEMP/tunic-ondevice/stage"
           test -s out/nxnative-android-peanuts.apk

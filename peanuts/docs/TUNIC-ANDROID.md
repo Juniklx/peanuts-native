@@ -2,9 +2,32 @@
 
 **Status:** Source profile added for Switch TUNIC v1.0.3 (v196608), title ID `0100DA801624E000`. The imported shader map is from the public nxnative profile, which was validated **on a Mac**, not on Android. An Android first-run log confirms guest initialization but a crash before a playable picture at the original 1 GiB application pool. Vulkan gameplay compatibility has **not** been confirmed. Do not call this game supported yet.
 
+## Experimental adjustable FPS (2026-11-20)
+
+The user reported that the 2-GiB build reaches the menu and allows controlling the fox. This is not a verified 60/90/120-FPS result. The initial Android log reported **no applicable engine FPS cap or rewritten frame-step**. The 60-FPS Mac profile is not evidence of 60-FPS Android play.
+
+The experimental profile now offers **Game owned** (safe default), **20, 30, 40, 45, 60, 90 and 120 FPS**. They are Android host *presentation-only* ceilings from `fps_limit_present 1` and `fps_limit_max 120`, **not** an engine unlock; the game may still present only ~30 FPS, or timing may become incorrect. Numeric limits are opt-in, show the experimental warning in Game settings and the in-game panel, and require restart when switching from/to Game owned.
+
+**No shader recompilation is required by this profile-only FPS change.** The new package ID is `dev.nxnative.android.tunicfpstest` because the earlier experimental APK had an unrecoverable GitHub-runner debug signature. To reuse the prepared pack from the already installed 2-GiB app, back up the original directory, then copy only the TUNIC pack folder from:
+
+```text
+/storage/emulated/0/Android/data/dev.nxnative.android.tunicmemtest/files/packs/0100DA801624E000
+```
+
+to:
+
+```text
+/storage/emulated/0/Android/data/dev.nxnative.android.tunicfpstest/files/packs/0100DA801624E000
+```
+
+Do this only after the new app has been opened at least once. Use a trusted authorized storage tool/ADB shell. **Never uninstall or clear the old test app to accomplish the copy.** Import/restore other per-app configuration and keys if the launcher requires them.
+
+For the first run, leave **Game owned** to confirm that the fox still moves normally. Then try **30 FPS**, restart, check gameplay animation/wall-clock duration and sound, and compare with **60 FPS** using the same short route. Test 90/120 only after lower modes behave correctly and only on a sufficiently fast display. Return to Game owned if anything speeds up or slows down. Shader count, FPS overlay and Vulkan errors should be included in follow-up logs.
+
+
 ## APK without a PC
 
-This fork includes the [TUNIC experimental Android APK workflow](../../.github/workflows/tunic-experimental-apk.yml). It compiles an isolated app (`dev.nxnative.android.tunicmemtest`, the 2-GiB test build) with the **native on-device preparation engine**, so the regular Peanuts Native installation and saves are not overwritten. The Action uses GitHub-hosted build tools, not files from your phone. It does not build or publish any copyrighted game data, prod.keys, ROM contents, shaders, or game packs.
+This fork includes the [TUNIC experimental Android APK workflow](../../.github/workflows/tunic-experimental-apk.yml). It compiles an isolated app (`dev.nxnative.android.tunicmemtest`, the original 2-GiB memory test build) with the **native on-device preparation engine**, so the regular Peanuts Native installation and saves are not overwritten. The Action uses GitHub-hosted build tools, not files from your phone. It does not build or publish any copyrighted game data, prod.keys, ROM contents, shaders, or game packs.
 
 - Open **Actions** in the GitHub repository and find **TUNIC experimental Android APK**. This workflow runs on a pull request touching the TUNIC profile or workflow. Manual **Run workflow** is available once the workflow file exists on the default branch.
 - If the Action succeeds, obtain `tunic-experimental-apk` from the run's **Artifacts**, extract the APK on your Android device and install it as a separate test app. A build artifact is not proof the game works.

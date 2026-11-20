@@ -1417,3 +1417,9 @@ The Trinity reader in `dm/gfx/tools/shader_split.py` narrows a recognized build 
 - The original `dev.nxnative.android.tunictest` APK was signed with the GitHub-hosted runner's ephemeral debug keystore; its private key was not retained. A later APK with a different key cannot update it. This failure does not imply a Vulkan/game regression.
 - Change the test package ID for the 2-GiB branch to `dev.nxnative.android.tunicmemtest`, allowing the original test APK and its `Android/data` pack (including translated shader library) to remain untouched and an on-device copy before running again.
 - Optionally load `TUNIC_TEST_KEYSTORE_B64` from GitHub Actions Secrets as the Gradle debug keystore, enabling stable **future** updates of the new test package after the secret is first configured. Without the secret, Actions continues using ephemeral debug signing; never commit the key to the repository.
+
+### TUNIC experimental FPS-cap selector (2026-11-20)
+
+- The player reports the updated **2-GiB** TUNIC test build reaches the menu and playable fox controls; not independently timed or checked against a fresh log. The old Android 1-GiB log showed `fps_target 60` **not applied** (no engine limiter or frame-step), unlike the Mac profile's Unity FPS handling.
+- Add `fps_limit_present 1` and `fps_limit_max 120` to the **TUNIC-specific** `game.tsv`. This exposes Android's already-existing **presentation-only** opt-in cap choices 20/30/40/45/60/90/120 and Game owned as default; it is not a Unity engine unlock. The UI already warns that it may change speed and requests restart when leaving/returning to Game owned. Do not claim confirmed 90/120 FPS.
+- Preserve 2 GiB application pool, memory layout, build and shader manifests. No shader map or pack rewriter modification. Use a new app ID `dev.nxnative.android.tunicfpstest` to avoid the ephemeral GitHub debug-signature conflict; copy prepared pack from `tunicmemtest` non-destructively if necessary.
