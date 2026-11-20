@@ -8,6 +8,20 @@
 
 ---
 
+## PEANUTS Android first run — Galaxy S24 FE, 2026-11-20
+
+**Observed, not inferred:** TUNIC 1.0.3 (v196608) reached native guest startup with the Android Peanuts test app (`dev.nxnative.android.tunictest`) on a Samsung SM-S721B (Android 17, ~7.1 GiB physical RAM), RADV Xclipse Mesa 27.0.0-devel (Vulkan 1.4.368). The host initialized NVN/Vulkan, opened AAudio at 48 kHz stereo and created game threads; **no first playable picture has been verified**.
+
+**Crash in the initial 1 GiB pool configuration:** The log refused repeated `MapPhysicalMemory` requests (16 MiB, 8 MiB, 256 KiB) with `ResultLimitReached` once 0.92–0.94 GiB was mapped, immediately followed by `CRASH sig=11 addr=0 pc=sdk+0x58979c lr=main+0x1fc2a4`. This strongly supports insufficient `app_pool` as the immediate failure path; a guest SIGSEGV is **not** an Android low-memory-killer event. An earlier independent `[RED] vk: timeline probe: its submission did not finish in 2 s` appeared on this RADV Xclipse driver; later timeline fence query returned immediately. Its significance for actual rendering is not yet established.
+
+**Next diagnostic revision:** `app_pool 0x80000000` (2 GiB) — **unverified on TUNIC**. A closely comparable Peanuts Android title, Chained Echoes (Unity 2020.3.36f1 IL2CPP, SDK 14.3.0), crashed on a 1 GiB pool and played its opening with a 2 GiB pool on an AYN Thor. TUNIC still needs its own trial. Retain the 5 GiB guest reservation and 4.375 GiB alias region for this isolated variable test. If it reaches the title or beach, capture peak mapped pool, max alias offset, Vulkan allocations, correctness, and device RAM use before further changes. With a larger pool, Unity's alias-space needs may become the next limit.
+
+**Driver test:** RADV Xclipse was explicitly selected in this run, so compare against the Samsung system Vulkan driver if the next run hangs or renders incorrectly. Do not interpret the log's launcher readiness PASS as proof that TUNIC Vulkan rendering works. This run did not establish a measured game FPS; `fps_target 60` was logged as *not applied* because the host found neither a frame-step stub nor a writable engine cap.
+
+**APK and data safety:** The regular Peanuts Native Release is separate; this test app uses its own Android package and app data. Builds on different GitHub-hosted runners may use different **debug signing keys**: do not assume a new experimental APK can update the previous test APK in place. Never uninstall either app before protecting any data you need; the original Release does not need replacing to test TUNIC.
+
+---
+
 # TUNIC (`0100DA801624E000`)
 
 Update 1.0.3 (v196608) over the base game, SDK 14.3.0. Andrew Shouldice's game (published by Finji) on Unity 2020.3.36f1 IL2CPP with FMOD (one AudioOut) on NVN. Modules `main`, `subsdk0` (the SDK's movie library) and `sdk`. It plays on the Mac at 60 fps (30 on the Switch) with no game-specific rewriter cut and no host change of its own: the NSP script's provisional profile with `fps_target 60` added. Reached: the title, New Game, the opening fly-over, control on the beach, the stairs up the cliff and the plateau above it with its first enemies, and the pause menu. No fight was started. Not run on an iPhone or iPad.

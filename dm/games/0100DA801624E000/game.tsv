@@ -30,8 +30,10 @@ zip_store	.assets:.bank:.dat:.png:.resource:.ress:.metallib
 mem_reserve	0x140000000
 mem_alias	0x118000000
 mem_stack	0x10000000
-# a 1 GB pool, so StandardAllocator's region leaves the game room for its own (the heap check: with the hardware pool the alias region was used up to +4.26 GB of 4.38 GB)
-app_pool	0x40000000
+# PEANUTS(Android, first S24 FE run 2026-11-20): app_pool 1 GiB exhausted before the first picture: MapPhysicalMemory refused at 0.92-0.94 GiB mapped, then SIGSEGV sdk+0x58979c. This is a guest-pool limit, NOT proof of device OOM.
+# PEANUTS: diagnostic 2 GiB pool, matching the successful Android Chained Echoes 2020.3.36f1 / SDK 14.3.0 bring-up; TUNIC itself has NOT been retested at this size. Keep mem_reserve/mem_alias/mem_stack unchanged until logs establish any address-space limit.
+# The nxnative Mac profile used 1 GiB (0x40000000), to leave room for the game's own StandardAllocator; it reported alias use up to +4.26 GiB of 4.38 GiB. Enlarging this pool risks alias-space pressure and Android RAM pressure. Measure both.
+app_pool	0x80000000
 sys_resource	0x1000000
 
 # ---- Shader split ----

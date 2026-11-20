@@ -1,6 +1,6 @@
 # TUNIC on Android (experimental)
 
-**Status:** Source profile added for Switch TUNIC v1.0.3 (v196608), title ID `0100DA801624E000`. The imported shader map is from the public nxnative profile, which was validated **on a Mac**, not on Android. No Android boot or GPU compatibility has been confirmed. Do not call this game supported yet.
+**Status:** Source profile added for Switch TUNIC v1.0.3 (v196608), title ID `0100DA801624E000`. The imported shader map is from the public nxnative profile, which was validated **on a Mac**, not on Android. An Android first-run log confirms guest initialization but a crash before a playable picture at the original 1 GiB application pool. Vulkan gameplay compatibility has **not** been confirmed. Do not call this game supported yet.
 
 ## APK without a PC
 
@@ -14,11 +14,15 @@ This fork includes the [TUNIC experimental Android APK workflow](../../.github/w
 
 ## Limits
 
-The upstream nxnative profile uses 60 fps and a 1 GiB application pool, but neither is a validated Android setting. The original Mac reports reached the opening area; later scenes were not verified. If an Android boot fails due to allocations or shader compilation, diagnose the log instead of blindly increasing the pool or removing draws.
+The upstream nxnative profile used 60 fps and a 1 GiB application pool. The first Android run filled the 1 GiB application pool and crashed; the experimental profile now uses 2 GiB, **not yet retested** on this game. The 60 fps target was not applied by the host in that first log. The original Mac reports reached the opening area; later scenes were not verified. The 2 GiB test is based on the equivalent Chained Echoes Unity/SDK configuration. Monitor guest alias address-space use and Android memory before changing anything else. If a new run fails, diagnose the new log instead of blindly increasing the pool or removing draws.
 
 The repository README recommends Android 13+, Snapdragon Vulkan 1.3 and 12 GiB or more of RAM. Devices outside that range (including Exynos/Xclipse phones with 8 GiB) are experimental and may fail at build, preparation, or game startup.
 
 For a desktop-pack alternative, follow [NEW-GAME.md](NEW-GAME.md) and [BUILDER.md](BUILDER.md). Keep dumps, generated shader libraries, packs, and APKs out of Git commits.
+
+## Test APK updates and signing
+
+GitHub-hosted builds can sign debug APKs with **different keys**. If the APK install reports a signature conflict, do not uninstall the installed app without backing up data you want to keep. The original official Peanuts Native app is separate and must not be uninstalled. Do not copy keystores or game files into this public GitHub repository.
 
 ## First-run checklist
 
