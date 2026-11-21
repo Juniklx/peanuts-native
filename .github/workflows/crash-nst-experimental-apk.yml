@@ -45,6 +45,8 @@ jobs:
       - name: Preflight public profile and documentation
         run: |
           python3 -m py_compile dm/tools/patch_nso.py
+          python3 -m py_compile dm/gfx/tools/iga.py dm/gfx/tools/shader_split.py dm/tools/tests/test_split_iga12.py
+          python3 dm/tools/tests/test_split_iga12.py  # PEANUTS: synthetic v12 archive only, no game assets
           python3 dm/tools/tests/test_docs.py GameNotes # PEANUTS: repository-wide legacy links fail independently of Crash NST
           sh peanuts/scripts/check-profiles.sh 0100D1B006744000
           python3 dm/peanuts/profile/gen_runtime_profile.py check-all

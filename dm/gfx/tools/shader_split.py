@@ -3310,8 +3310,22 @@ def iga_member(f, sector, off, length, blocks):
     return bytes(out)
 
 def iga_shaders(path, rel, found):
-    """Whole GLSLC outputs in the files of an igArchive (Crash Team Racing Nitro-Fueled: 2,582 in the 86 shader .igz files of archives/shaders_nx.pak, one stage each; its other
-    400 archives hold none). Every file is decoded and looked at, by no name"""
+    """Whole GLSLC outputs in Alchemy IGA archives.
+    PEANUTS: v12 N. Sane Trilogy uses 40-bit member offsets and the build path for shader source IDs;
+    use DroidPlay Core's bounded v12 reader. Keep existing Peanuts v13 reader unchanged for CTR.
+    Provenance: https://github.com/enjoyerofslop/droidplay-core/blob/8115593e8a7f9ebfa0659008a1accadb9c79a8e9/dm/gfx/tools/iga.py
+    """
+    with open(path, 'rb') as f:
+        header = f.read(8)
+    if len(header) >= 8 and header[:4] == IGA and struct.unpack_from('<I', header, 4)[0] == 12:
+        from iga import shader_files   # PEANUTS: version 12 (Game N. Sane Trilogy), from MIT-licensed DroidPlay Core
+        try:
+            for name, d in shader_files(path):
+                if b'\x91\x68\x86\x19' in d: found += glslc_shaders(d, f'/{rel}/{name}', need=False)
+        except ValueError as e:
+            red(f'{rel}: igArchive v12: {e}')
+        return
+    # PEANUTS: version 13 reader for Crash Team Racing stays exactly as before
     with open(path, 'rb') as f:
         sector, ents = iga_entries(f)
         for name, off, length, blocks in ents:
