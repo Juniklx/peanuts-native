@@ -1158,6 +1158,7 @@ public final class MainActivity extends Activity {
     private static final class Pick {
         final File game;
         String id, name, error;   // error: why it cannot be added (unreadable, no profile in this APK), in a sentence
+        String survey;            // PEANUTS: Crash 4 unsupported-game NSO-header metadata; no ROM/code copied
         String plain;             // an NSP this app does not read (Nsp.Refused): what to tell the player; error is then the technical detail
         boolean unsupported;      // no profile in this APK
         boolean dump;             // a dump Prepare starts from (Pack.isDump)
@@ -1194,7 +1195,11 @@ public final class MainActivity extends Activity {
                     continue;
                 }
                 String why = Profile.missing(k.id, single ? null : g.getName());
-                if (why != null) { k.unsupported = true; k.error = why; continue; }
+                if (why != null) {
+                    k.unsupported = true; k.error = why;
+                    if (Crash4Survey.TITLE_ID.equals(k.id)) k.survey = Crash4Survey.report(g);
+                    continue;
+                }
                 k.name = Profile.of(k.id).name;
                 k.dump = Pack.isDump(g);
                 String pp = Folders.pickedPack(this, k.id);
@@ -1218,6 +1223,20 @@ public final class MainActivity extends Activity {
         if (single) {
             Pick k = picks.get(0);
             if (k.error != null) {
+                // PEANUTS: Crash 4 has no validated host/profile. Allow read-only build-ID survey
+                // on Android without pretending Prepare/Play is supported.
+                if (k.survey != null) {
+                    new PadFocus.Builder(this).setTitle("Crash 4: metadata survey (not playable)")
+                            .setMessage(k.error + "\n\n" + k.survey)
+                            .setPositiveButton("OK", null)
+                            .setNeutralButton("Copy metadata", (d, w) -> {
+                                android.content.ClipboardManager clipboard =
+                                        (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                                if (clipboard != null) clipboard.setPrimaryClip(ClipData.newPlainText("Crash 4 metadata", k.survey));
+                                Toast.makeText(this, "Crash 4 metadata copied", Toast.LENGTH_SHORT).show();
+                            }).show();
+                    return;
+                }
                 if (k.plain != null) Ui.explain(this, "Cannot use this NSP", k.plain, k.error).setPositiveButton("OK", null).show();
                 else error(k.error);
                 return;
