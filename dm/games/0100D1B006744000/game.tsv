@@ -40,6 +40,16 @@ shader_note	Crash Bandicoot™ N. Sane Trilogy shaders
 # The engine's Bink layer compiles its movie shaders at boot with the game's own GLSLC (subsdk0; 5 GLSL sources in main, 2 compiled before the Activision bumper): the NSP script
 # captures them once on the Mac with DM_GLSLC_CAPTURE=<version dir>/glslc_capture (hle_glslc.c), as for any game whose main holds GLSL sources and imports glslcCompile
 
+# ---- Frame-rate cap (S24 FE experimental, presentation pacing only) ----
+# PEANUTS: opt-in host-side presentation caps, mirroring the TUNIC test UI.
+# Crash NST Switch v0 normally runs at 30 fps. These rows do NOT remove an
+# internal game-engine 30-fps lock; validate with the runtime counter and
+# timed gameplay before claiming higher actual simulation/render rates.
+# Default/Game owned leaves the game's original timing intact.
+fps_limit_present	1
+fps_limit_max	120
+fps_limit_min	15
+
 # ---- After the rewrite ----
 # used memory for the rewritten modules (92 MB, over the default 64 MB), which main's heap request counts
 mem_used	0x5c00000

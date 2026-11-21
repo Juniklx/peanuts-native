@@ -1,5 +1,5 @@
 # PEANUTS: source-only experimental Crash Bandicoot N. Sane Trilogy test app. No game data, keys, ROMs or compiled shaders are uploaded.
-# PEANUTS: crashnstnupfix is isolated from the official app, TUNIC apps and the first crashnsttest build. Fresh GitHub debug signing keys cannot update old APKs.
+# PEANUTS: crashnstfpstest is isolated from the official app, TUNIC apps and the first crashnsttest build. Fresh GitHub debug signing keys cannot update old APKs.
 name: Crash NST experimental Android APK
 
 on:
@@ -104,8 +104,8 @@ jobs:
           chmod +x ./gradlew
           ./gradlew apk --no-daemon \
             -PnxApp=peanuts \
-            -PnxAppId=crashnstnupfix \
-            -PnxLabel="Peanuts Crash NST NUP fix" \
+            -PnxAppId=crashnstfpstest \
+            -PnxLabel="Peanuts Crash NST FPS test" \
             -PnxGames=0100D1B006744000 \
             -PnxPackStage="$RUNNER_TEMP/crashnst-ondevice/stage"
           test -s out/nxnative-android-peanuts.apk

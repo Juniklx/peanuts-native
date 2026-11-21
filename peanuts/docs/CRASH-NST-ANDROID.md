@@ -43,3 +43,22 @@ The attached Build log from APK commit \`4330e8e\` confirms cross-APK pack rebin
 The cause is isolated: \`shader_split.py\` already imports \`open\` from \`dm/tools/romfs.py\`, which handles these virtual NUP member paths. The imported \`dm/gfx/tools/iga.py\` v12 reader's \`shader_files\` defaults to builtin \`open\`, which treats \`.nup:base/romfs/...\` as a literal filename. The fixed dispatcher now passes \`opener=open\` explicitly, preserving its existing v13 dispatch. An AST-extracted regression test in \`dm/tools/tests/test_split_iga12.py\` simulates a virtual NUP stream, checks both reads use the virtual opener, and runs in GitHub Actions preflight.
 
 The test APK is now \`dev.nxnative.android.crashnstnupfix\`, intentionally separate from previous debug-signed builds. A resumed job remains in the shared work folder beside the dump; the cross-APK pack redirect migrates its old destination to the new app's empty pack folder. The game files, saves and TUNIC installation are untouched. The full shader library, dynamic GLSLC capture and the game's actual launch remain **unverified**.
+
+## S24 FE FPS menu experiment (2026-11-20)
+
+The user reports that Crash NST v0 now launches and plays on a Galaxy S24 FE, with
+a frame-rate display around 30 FPS and all explicit frame-rate caps greyed out,
+as in the initial TUNIC test. The profile had no frame-rate UI rows, so this
+branch now declares `fps_limit_present 1`, `fps_limit_min 15`, and
+`fps_limit_max 120`, matching TUNIC's opt-in *presentation-cap* experiment.
+Those settings only make the selector available. They do not prove or force
+a change to Crash's original Switch game-engine 30-FPS cadence. Test 60 FPS
+first (then 90/120 if appropriate), checking real frame delivery, game speed,
+cutscenes, saves and responsiveness; switch back to Game owned if anything
+behaves incorrectly. The source-supported Switch 1.0.0 60-FPS patch is a
+separate prospective engine-level investigation, not applied by this change.
+
+The FPS test APK uses `dev.nxnative.android.crashnstfpstest` to avoid a
+temporary GitHub Actions signing-key conflict. It installs alongside the
+known-working `crashnstnupfix` and TUNIC APKs; do not uninstall them or
+delete their data. A new app package may need its own Prepare data.
