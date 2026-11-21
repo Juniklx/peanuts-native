@@ -90,6 +90,17 @@ jobs:
       - name: Compile isolated Peanuts test APK (Crash NST only)
         working-directory: android/app
         run: |
+          # PEANUTS: Maven Central can return HTTP 429 to GitHub-hosted runners.
+          # Prefer Google's public Maven Central mirror in this isolated CI job;
+          # keep the original mavenCentral() fallback and leave repository sources unchanged.
+          python3 - <<'PY'
+          from pathlib import Path
+          settings = Path("settings.gradle")
+          before = settings.read_text()
+          assert before.count("mavenCentral()") == 2, "Unexpected Gradle repository layout"
+          mirror = 'maven { url "https://maven-central.storage-download.googleapis.com/maven2/" }; mavenCentral()'
+          settings.write_text(before.replace("mavenCentral()", mirror))
+          PY
           chmod +x ./gradlew
           ./gradlew apk --no-daemon \
             -PnxApp=peanuts \
