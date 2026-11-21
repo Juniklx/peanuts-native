@@ -4,7 +4,7 @@ For the **Switch base game 1.0.0 (v0), title ID `0100D1B006744000`**, this branc
 
 ## Without a PC
 
-The GitHub Actions workflow **Crash NST experimental Android APK** on `feat/crash-nst-android-experimental` builds only an isolated APK. When successful, download the **crash-nst-experimental-apk** ZIP from its run's **Artifacts** and extract the APK. Its Android package name is `dev.nxnative.android.crashnsttest`. The signed Peanuts Native Release and the TUNIC test apps have different package IDs and must not be uninstalled.
+The GitHub Actions workflow **Crash NST experimental Android APK** on `feat/crash-nst-android-experimental` builds only an isolated APK. When successful, download the **crash-nst-experimental-apk** ZIP from its run's **Artifacts** and extract the APK. Its Android package name is `dev.nxnative.android.crashnstv12test`. The signed Peanuts Native Release and the TUNIC test apps have different package IDs and must not be uninstalled.
 
 The APK contains neither a game nor private files. Use your own Switch 1.0.0 dump with the app's Build/Prepare function. Import any needed keys/firmware only into the local Android app; never commit, message or publish them. Because this game compiles **two GLSLC shaders during startup**, the app may need to run its automated shader-capture phase to finish Prepare. If Build fails, save its **Build log**, not the game files.
 
@@ -24,3 +24,5 @@ From the attached `build-log-0100D1B006744000-20261120-211116-7860a2410a414d6abd
 - Not a confirmed bad dump, OOM or rewriter bug. Host's v13 IGA parser was simply not made for the v12 format in this game.
 - Fix in this branch: add the upstream DroidPlay Core MIT-licensed v12 reader `dm/gfx/tools/iga.py` (40-bit offsets, build-path names, bounds checks, LZMA), dispatch *only* v12 archives to it; leave v13 CTR reader unchanged. A source-only synthetic v12 test runs in Actions before the APK build.
 - Test again in the **updated APK**, not Retry with the old APK: the on-device Prepare engine lives inside the installed APK. The existing partial Build folder can be retried; don't delete your original dump or any TUNIC files. Further failures should be reported using a new Build log, especially `GLSLC` capture, shader map mismatch or memory errors.
+
+The **first** experimental APK used package `dev.nxnative.android.crashnsttest`. Its private runner signing key was not saved. The v12 IGA reader build therefore uses a new package `dev.nxnative.android.crashnstv12test` and installs alongside the first one, avoiding a forced uninstall. Preserve the existing work folder and do not clear either app's storage. Subsequent updates of `crashnstv12test` still require a persistent signing secret.

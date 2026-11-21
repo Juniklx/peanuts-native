@@ -14,7 +14,7 @@ Peanuts Native already has an Alchemy IGA v13 shader reader used for Crash Team 
 
 ## Experimental Android plan — Galaxy S24 FE
 
-1. Build an **isolated** test APK `dev.nxnative.android.crashnsttest`; never update the official Peanuts or any TUNIC test app.
+1. Build an **isolated** test APK `dev.nxnative.android.crashnstv12test`; never update the official Peanuts or any TUNIC test app.
 2. Import the user's own **base Switch 1.0.0** dump into this app and run its on-device Build/Prepare. No game assets, compiled shaders, packs, keys or firmware go in GitHub.
 3. Capture Prepare output, including any run-time GLSLC capture / rewriter error. This experimental branch includes a narrowly restricted, last-resort **general rewriter fallback** for the table-base-after-guard form in [nxnative #396](https://github.com/seedds/nxnative/issues/396): `jump table 997b78`. The alternative zero-extended index form (`efcc2c`) was already supported by the Peanuts rewriter. The fallback is adapted from public DroidPlay Core work, checked only after existing recognizers fail, and has **not** been tested against the user's game dump or on the S24 FE. Preserve a log on failure.
 4. If the pack builds, test intro, menu and N. Sanity Beach with a physical gamepad, audio, graphics, saves and GPU driver. Gather `Share log` on failure.
