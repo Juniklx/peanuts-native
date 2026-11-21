@@ -89,6 +89,31 @@ class Iga(unittest.TestCase):
         with self.assertRaises(SystemExit) as e: ss.iga_entries(io.BytesIO(archive([('a', b'x', 'c')], kind=3)))
         self.assertIn('compression 3', str(e.exception.code))
 
+    def test_v12_archive_inside_virtual_nup_uses_romfs_opener(self):
+        """PEANUTS: a .nup:base/romfs path is virtual, not a physical filesystem path.
+        The IGA v12 reader must receive shader_split's romfs.open, not builtin open."""
+        mag = b'\x91\x68\x86\x19'
+        d = archive([('shaders/CrashTest.igz', b'igz' + mag + b'shader', 'c')], version=12)
+        virtual = '/storage/emulated/0/Crash.nup:base/romfs/archives/shaders_nx.pak'
+        opened = []
+        old_open, old_glslc = ss.open, ss.glslc_shaders
+        def virtual_open(path, mode='rb'):
+            if path != virtual or mode != 'rb': raise AssertionError('unsupported virtual file path')
+            opened.append(path)
+            return io.BytesIO(d)
+        seen = []
+        ss.open = virtual_open
+        ss.glslc_shaders = lambda data, label, need=True, skip=(), sink=None: seen.append((data, label, need)) or [(label, 'ps', b'ctl', data)]
+        try:
+            found = []
+            ss.iga_shaders(virtual, 'archives/shaders_nx.pak', found)
+        finally:
+            ss.open, ss.glslc_shaders = old_open, old_glslc
+        self.assertEqual(opened, [virtual, virtual])
+        self.assertEqual(len(found), 1)
+        self.assertEqual(seen, [(b'igz' + mag + b'shader',
+                                 '/archives/shaders_nx.pak/c:/build/shaders/CrashTest.igz', False)])
+
     def test_a_damaged_block_stops_with_a_reason(self):
         d = bytearray(archive([('a.igz', noise(0x4000), 'c')]))
         f = io.BytesIO(bytes(d)); sector, ((_, off, length, blocks),) = ss.iga_entries(f)

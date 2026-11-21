@@ -3320,7 +3320,7 @@ def iga_shaders(path, rel, found):
     if len(header) >= 8 and header[:4] == IGA and struct.unpack_from('<I', header, 4)[0] == 12:
         from iga import shader_files   # PEANUTS: version 12 (Game N. Sane Trilogy), from MIT-licensed DroidPlay Core
         try:
-            for name, d in shader_files(path):
+            for name, d in shader_files(path, opener=open):   # PEANUTS: romfs.open resolves virtual .nup:base/romfs/* paths; builtin open fails
                 if b'\x91\x68\x86\x19' in d: found += glslc_shaders(d, f'/{rel}/{name}', need=False)
         except ValueError as e:
             red(f'{rel}: igArchive v12: {e}')

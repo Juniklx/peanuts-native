@@ -62,6 +62,35 @@ class IgaV12(unittest.TestCase):
         self.assertEqual(result[0][1], b"igz" + bytes.fromhex("91688619") + b"x" * 500)
         self.assertEqual(result[1][1], b"stored-shader")
 
+    def test_shader_split_dispatch_reads_virtual_nup_without_builtin_open(self):
+        """Run shader_split.py's real iga_shaders function in isolation with a virtual NUP stream.
+        A bare 'open(path)' inside the upstream IGA reader fails here; opener=romfs.open is required."""
+        import ast
+        import types
+        src = (Path(__file__).resolve().parents[2] / "gfx" / "tools" / "shader_split.py").read_text()
+        tree = ast.parse(src)
+        func = next(x for x in tree.body if isinstance(x, ast.FunctionDef) and x.name == "iga_shaders")
+        module = ast.fix_missing_locations(ast.Module(body=[func], type_ignores=[]))
+        payload = fixture()
+        name = "/storage/emulated/0/Crash.nup:base/romfs/archives/shaders_nx.pak"
+        calls = []
+        def virtual_open(path, mode="rb"):
+            if (path, mode) != (name, "rb"): raise AssertionError("expected romfs virtual open")
+            calls.append(path)
+            return io.BytesIO(payload)
+        seen = []
+        def fake_glslc(d, label, need=False):
+            seen.append((d, label, need))
+            return [(label, "ps", b"ctl", d)]
+        scope = dict(open=virtual_open, struct=struct, IGA=iga.MAGIC, glslc_shaders=fake_glslc,
+                     red=lambda message: (_ for _ in ()).throw(ValueError(message)))
+        exec(compile(module, "shader_split.py", "exec"), scope)
+        found = []
+        scope["iga_shaders"](name, "archives/shaders_nx.pak", found)
+        self.assertEqual(len(calls), 2)  # header and IGA members both go through the NUP-aware opener
+        self.assertEqual(len(found), 1)
+        self.assertEqual(seen[0][1], "/archives/shaders_nx.pak/build/shaders/Bloom.igz")
+
     def test_other_iga_version_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "version 13"):
             list(iga.shader_files("fake.pak", opener=lambda *args: io.BytesIO(fixture(ver=13))))
