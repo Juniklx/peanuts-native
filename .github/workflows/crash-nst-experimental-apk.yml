@@ -1,5 +1,5 @@
 # PEANUTS: source-only experimental Crash Bandicoot N. Sane Trilogy test app. No game data, keys, ROMs or compiled shaders are uploaded.
-# PEANUTS: crashnstv12test is isolated from the official app, TUNIC apps and the first crashnsttest build. Fresh GitHub debug signing keys cannot update old APKs.
+# PEANUTS: crashnstv12fix is isolated from the official app, TUNIC apps and the first crashnsttest build. Fresh GitHub debug signing keys cannot update old APKs.
 name: Crash NST experimental Android APK
 
 on:
@@ -47,6 +47,9 @@ jobs:
           python3 -m py_compile dm/tools/patch_nso.py
           python3 -m py_compile dm/gfx/tools/iga.py dm/gfx/tools/shader_split.py dm/tools/tests/test_split_iga12.py
           python3 dm/tools/tests/test_split_iga12.py  # PEANUTS: synthetic v12 archive only, no game assets
+          mkdir -p "$RUNNER_TEMP/packrebind-jvm"
+          javac -d "$RUNNER_TEMP/packrebind-jvm" android/app/src/ondevice/java/dev/nxnative/android/PackRebind.java android/app/src/jvmtest/java/dev/nxnative/android/PackRebindJvmTest.java
+          java -cp "$RUNNER_TEMP/packrebind-jvm" dev.nxnative.android.PackRebindJvmTest
           python3 dm/tools/tests/test_docs.py GameNotes # PEANUTS: repository-wide legacy links fail independently of Crash NST
           sh peanuts/scripts/check-profiles.sh 0100D1B006744000
           python3 dm/peanuts/profile/gen_runtime_profile.py check-all
@@ -90,8 +93,8 @@ jobs:
           chmod +x ./gradlew
           ./gradlew apk --no-daemon \
             -PnxApp=peanuts \
-            -PnxAppId=crashnstv12test \
-            -PnxLabel="Peanuts Crash NST v12" \
+            -PnxAppId=crashnstv12fix \
+            -PnxLabel="Peanuts Crash NST v12 fix" \
             -PnxGames=0100D1B006744000 \
             -PnxPackStage="$RUNNER_TEMP/crashnst-ondevice/stage"
           test -s out/nxnative-android-peanuts.apk

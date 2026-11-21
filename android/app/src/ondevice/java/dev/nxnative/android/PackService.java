@@ -148,7 +148,15 @@ public final class PackService extends Service {
         File f = path != null ? new File(path) : Job.remembered(this);
         Job j = null;
         try {
-            if (f != null) j = Job.read(f);
+            if (f != null) {
+                j = Job.read(f);
+                File recordedPack = j.pack();
+                if (j.rebindOldAppPack(this)) {
+                    j.save();
+                    Log.i(TAG, "PEANUTS: redirected stale pack target from " + recordedPack
+                            + " to " + j.pack() + " (a prior test APK's app-private storage is inaccessible)");
+                }
+            }
         } catch (IOException e) {
             Log.w(TAG, "job: " + e.getMessage());
         }

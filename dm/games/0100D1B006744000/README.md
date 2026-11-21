@@ -23,3 +23,7 @@ Peanuts Native already has an Alchemy IGA v13 shader reader used for Crash Team 
 **Not yet verified on S24 FE:** boot, FPS, Vulkan graphics, RAM, stable save data or gamepad. Memory values in `game.tsv` are inherited from the DroidPlay Core provisional survey (including `app_pool 0xCD500000`) and are not S24 FE measurements. They must not be replaced with TUNIC's 2-GiB pool without evidence.
 
 The title is not added to `peanuts/release-titles.txt`; this experiment is not an official supported-game claim.
+
+## S24 FE second Build log: cross-APK resumed path (2026-11-20)
+
+The v12 test APK was installed and detected in the diagnostic summary. However its resumed job referenced the old app's private `Android/data/dev.nxnative.android.crashnsttest` pack target, causing `PermissionError: [Errno 13]` in the **rewrite step** on each Retry. Its included split log records the *earlier* v13 error only, so the current v12 reader has **not yet been exercised on the actual game files**. A new `PackRebind` safety policy and a recovery call in `PackService` redirect only owned default app-private targets from earlier nxnative app IDs; they leave other pack locations and old app data untouched. This branch's new test app ID is `dev.nxnative.android.crashnstv12fix`. Do not delete or move the original dump, old app data or shared working files to work around this; collect a new log after Retry.

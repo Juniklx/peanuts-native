@@ -209,6 +209,18 @@ final class Job {
             throw new IllegalStateException(e);
         }
     }
+    // PEANUTS: the work folder can outlive the APK that created it. A newly installed test app
+    // must not resume writing to Android/data/<old package>/files/packs/<id>, which Android 17 denies.
+    // Redirect only an own, default app-private pack from a *different* nxnative package;
+    // never alter adopted packs, user-selected folders or modded jobs; never touch old app data.
+    synchronized boolean rebindOldAppPack(Context c) {
+        File dest = PackRebind.target(c.getExternalFilesDir(null), pack(), titleId(), c.getPackageName(),
+                ownsPack(), !adopted().isEmpty(), !modArgs().isEmpty());
+        if (dest == null || !isNew(dest)) return false;   // a populated destination is not ours to overwrite
+        pack(dest);   // updates both "pack" and "own_pack"; the normal missing-output check handles redo
+        return true;
+    }
+
     File dir() { return file.getParentFile(); }
     /** The pack folder this job took over as it was (Job.adopt), "" when the job makes its own */
     synchronized String adopted() { return o.optString("adopted", ""); }
