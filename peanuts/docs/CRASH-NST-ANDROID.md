@@ -49,7 +49,7 @@ The test APK is now \`dev.nxnative.android.crashnstnupfix\`, intentionally separ
 The user reports that Crash NST v0 now launches and plays on a Galaxy S24 FE, with
 a frame-rate display around 30 FPS and all explicit frame-rate caps greyed out,
 as in the initial TUNIC test. The profile had no frame-rate UI rows, so this
-branch now declares `fps_limit_present 1`, `fps_limit_min 15`, and
+branch now declares `fps_limit_present 1`, `fps_limit_min 20`, and
 `fps_limit_max 120`, matching TUNIC's opt-in *presentation-cap* experiment.
 Those settings only make the selector available. They do not prove or force
 a change to Crash's original Switch game-engine 30-FPS cadence. Test 60 FPS
@@ -62,3 +62,9 @@ The FPS test APK uses `dev.nxnative.android.crashnstfpstest` to avoid a
 temporary GitHub Actions signing-key conflict. It installs alongside the
 known-working `crashnstnupfix` and TUNIC APKs; do not uninstall them or
 delete their data. A new app package may need its own Prepare data.
+
+GitHub Actions build #7 failed while evaluating `android/app/build.gradle` because
+`fps_limit_min 15` is unsupported by the Gradle profile validator (allowed:
+20 or 30). This correction uses `fps_limit_min 20`. The additional Android
+Gradle Plugin root-project message followed that configuration failure; no
+runtime or APK result is implied by the failed build.

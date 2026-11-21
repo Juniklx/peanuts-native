@@ -48,7 +48,7 @@ shader_note	Crash Bandicoot™ N. Sane Trilogy shaders
 # Default/Game owned leaves the game's original timing intact.
 fps_limit_present	1
 fps_limit_max	120
-fps_limit_min	15
+fps_limit_min	20
 
 # ---- After the rewrite ----
 # used memory for the rewritten modules (92 MB, over the default 64 MB), which main's heap request counts
