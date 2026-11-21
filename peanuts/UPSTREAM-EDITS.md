@@ -1408,3 +1408,35 @@ The Trinity reader in `dm/gfx/tools/shader_split.py` narrows a recognized build 
 - **Cross-APK work-folder resume:** the second S24 FE ZIP confirmed the new `crashnstv12test` app had loaded the first `crashnsttest` app's `job.json`, which still pointed its pack into the older app-private `Android/data` tree. Its immediate `PermissionError` on three retries was a stale job destination, **not** a failure of the v12 shader reader; the included split log was the old v13 run. Add pure path policy `PackRebind`, JVM regression test and `PackService` pre-start recovery to redirect only owned, default nxnative test-app pack destinations into the current app's empty packs folder; preserve working files and all non-default, adopted, modded and populated locations. Give the new APK its own package ID `crashnstv12fix` to avoid runner debug-signature mismatch. `pack` is persisted to `job.json` before starting a worker.
 - **Third S24 FE Build log:** The rebinding worked and code rewrite finished, but the v12 IGA reader attempted builtin \`open()\` on 166 virtual \`.nup:base/romfs/archives/*.pak\` member paths, returning \`FileNotFoundError\`. Pass \`opener=open\` from \`shader_split.py\` (already imported from \`romfs\`) to the v12 \`iga.shader_files\` call. Add a source-level isolated regression test for a synthetic virtual NUP stream. No dump corruption confirmed, do not advise redumping. Keep CTR's v13 path untouched and use a new isolated debug APK ID \`crashnstnupfix\`. The user's v12 shaders and on-device runtime GLSLC results still need verification.
 
+## TUNIC 1.0.3 — experimental Android profile import (2026-11-20)
+
+- **Source:** `seedds/nxnative`, `dm/games/0100DA801624E000/`. Its Mac profile and public shader facts/maps are imported, without game code, ROM data, shader binaries, keys or packs.
+- **Android status:** no device run, Vulkan shader build, pack, gamepad, save, audio or performance verification. The upstream Mac memory and 60 fps defaults are copied, not tuned for Android.
+- **Marked files:** `dm/games/0100DA801624E000/game.tsv` and `README.md` have `PEANUTS` notes; `dm/games/README.md` adds an explicitly unverified profile-table row.
+- **Unmarked generated tables:** `bf_want.tsv`, `pso_manifest.tsv`, `pso_pairs.tsv`, `shader_facts.tsv`, `shader_map.tsv`, `shader_map.tsv.conflicts.tsv`, `shader_pairs.tsv` under `dm/games/0100DA801624E000/` are listed in `peanuts/upstream-unmarked.txt`. Marking any generated input would change the digest that identifies its shader library.
+- **Release eligibility:** this profile is intentionally **absent** from `peanuts/release-titles.txt` and public supported-games catalog until an Android launch and limitations are documented.
+- **TUNIC CI follow-up:** The TUNIC Android bring-up registers the imported 60 fps profile key in the generated `docs/agents/game-patches.md` index. The upstream nxnative Mac-only links in its original note now point to their original upstream locations; this fork's older Markdown references are not a clean full-tree `test_docs.py` baseline, so TUNIC CI checks the profile-note/table invariant (`GameNotes`) rather than requiring unrelated legacy links to be fixed.
+
+### TUNIC — first S24 FE Android log (2026-11-20)
+
+- **Evidence:** `0100DA801624E000-20261120-184112.log`, supplied privately; not committed (user paths and device state). Android 17 / RADV Xclipse Mesa 27; 1 GiB `app_pool`; multiple `MapPhysicalMemory` refusals at 0.92–0.94 GiB immediately precede `SIGSEGV` at `sdk+0x58979c`. A separate Vulkan timeline probe took over 2 s; no playable frame proved.
+- **PEANUTS change:** `dm/games/0100DA801624E000/game.tsv` increases **only** `app_pool` from `0x40000000` to `0x80000000` (2 GiB). Sibling `0100C510166F0000` (Chained Echoes: same Unity 2020.3.36f1 / SDK 14.3.0) also needed 2 GiB, confirmed on Android; not a measured TUNIC result.
+- **Guardrail:** preserve `mem_reserve`, `mem_alias`, `mem_stack`, 60 fps target and driver settings until an independent test separates guest pool, alias-space exhaustion, device memory pressure, and RADV-specific Vulkan issues. Keep TUNIC **out** of the supported-games release list.
+
+### TUNIC APK signature mismatch after the 2-GiB test build (2026-11-20)
+
+- The original `dev.nxnative.android.tunictest` APK was signed with the GitHub-hosted runner's ephemeral debug keystore; its private key was not retained. A later APK with a different key cannot update it. This failure does not imply a Vulkan/game regression.
+- Change the test package ID for the 2-GiB branch to `dev.nxnative.android.tunicmemtest`, allowing the original test APK and its `Android/data` pack (including translated shader library) to remain untouched and an on-device copy before running again.
+- Optionally load `TUNIC_TEST_KEYSTORE_B64` from GitHub Actions Secrets as the Gradle debug keystore, enabling stable **future** updates of the new test package after the secret is first configured. Without the secret, Actions continues using ephemeral debug signing; never commit the key to the repository.
+
+### TUNIC experimental FPS-cap selector (2026-11-20)
+
+- The player reports the updated **2-GiB** TUNIC test build reaches the menu and playable fox controls; not independently timed or checked against a fresh log. The old Android 1-GiB log showed `fps_target 60` **not applied** (no engine limiter or frame-step), unlike the Mac profile's Unity FPS handling.
+- Add `fps_limit_present 1` and `fps_limit_max 120` to the **TUNIC-specific** `game.tsv`. This exposes Android's already-existing **presentation-only** opt-in cap choices 20/30/40/45/60/90/120 and Game owned as default; it is not a Unity engine unlock. The UI already warns that it may change speed and requests restart when leaving/returning to Game owned. Do not claim confirmed 90/120 FPS.
+- Preserve 2 GiB application pool, memory layout, build and shader manifests. No shader map or pack rewriter modification. Use a new app ID `dev.nxnative.android.tunicfpstest` to avoid the ephemeral GitHub debug-signature conflict; copy prepared pack from `tunicmemtest` non-destructively if necessary.
+- **Opt-in 15 fps:** `fps_limit_min 15` (TUNIC only). `FrameRateCaps.menu()` exposes it, `FrameRateCaps.rates(max,min)` permits it only if `min=15`; profile parser and Gradle validate that opt-in. Other games retain the 20 fps default/minimum. Host presentation limiter supports 15, but correct TUNIC simulation speed at 15 is unverified. Updated JVM cap policy test.
+
+## PEANUTS combined TUNIC + Crash NST Android experiment
+
+- The isolated APK incorporates TUNIC 1.0.3 profile (2 GiB guest app pool, per-game presentation caps) and Crash N. Sane Trilogy 1.0.0 profile (v12 archive support, NUP virtual reader, PackRebind, experimental presentation caps). No user game content or compiled shader binaries are included.
+- Package `dev.nxnative.android.tuniccrashdual` installs alongside the old test apps and does not touch the public release. Combined runtime, saves and FPS must be validated on the phone.

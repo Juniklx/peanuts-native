@@ -156,7 +156,7 @@ def fpsLimitMinOf = { String game ->
     def rs = tsvRows(game, 'fps_limit_min')
     if (rs.isEmpty()) return ''
     def value = rs[0].size() > 1 ? rs[0][1].trim() : ''
-    if (!(value in ['20', '30'])) throw new GradleException("$game: fps_limit_min must be 20 or 30")
+    if (!(value in ['15', '20', '30'])) throw new GradleException("$game: fps_limit_min must be 15, 20 or 30")
     value
 }
 def fpsModesOf = { String game ->
